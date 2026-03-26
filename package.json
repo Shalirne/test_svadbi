@@ -1,0 +1,12 @@
+{
+  "name": "wedding-rsvp-google-sheets",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wedding RSVP frontend with backend Google Sheets integration",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
