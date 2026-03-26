@@ -136,7 +136,9 @@
 
     const submitButton = form.querySelector('button[type="submit"]');
     const statusNode = form.querySelector('[data-form-status]');
+    const formControls = Array.from(form.querySelectorAll('input, button, select, textarea'));
     let isPending = false;
+    let isSubmitted = false;
 
     function setStatus(state, message) {
       if (!statusNode) return;
@@ -150,8 +152,16 @@
 
     function setPending(nextPending) {
       isPending = nextPending;
-      if (submitButton) submitButton.disabled = nextPending;
+      if (submitButton) submitButton.disabled = nextPending || isSubmitted;
       form.classList.toggle('is-pending', nextPending);
+    }
+
+    function lockFormAfterSuccess() {
+      isSubmitted = true;
+      form.classList.add('is-submitted');
+      formControls.forEach((control) => {
+        control.disabled = true;
+      });
     }
 
     function collectPayload() {
@@ -184,7 +194,7 @@
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (isPending) return;
+      if (isPending || isSubmitted) return;
       const payload = collectPayload();
       const validationMessage = getValidationMessage(payload);
       if (validationMessage) {
@@ -204,7 +214,8 @@
           const message = result?.message || (Array.isArray(result?.details) && result.details[0]?.message) || 'Не удалось сохранить ответ. Попробуйте ещё раз.';
           throw new Error(message);
         }
-        setStatus('success', 'Спасибо! Ваш ответ сохранён.');
+        lockFormAfterSuccess();
+        setStatus('success', 'Спасибо, до встречи на Свадьбе');
       } catch (error) {
         setStatus('error', error?.message || 'Не удалось сохранить ответ. Попробуйте ещё раз.');
       } finally {
